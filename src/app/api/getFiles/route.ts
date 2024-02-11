@@ -1,7 +1,7 @@
 // src/app/api/getFiles/route.ts
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
-import type { NextApiRequest, NextApiResponse } from "next";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 const s3Client = new S3Client({
   credentials: {
@@ -11,16 +11,17 @@ const s3Client = new S3Client({
   region: process.env.AWS_REGION || "us-east-1",
 });
 
-interface ApiResponse {
-  files: string[];
-  error?: string;
-  message?: string;
-}
+export async function GET(req: NextRequest) {
+  // Verificar el método HTTP
+  if (req.method !== "GET") {
+    return new NextResponse(JSON.stringify({ error: "Method Not Allowed" }), {
+      status: 405,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
 
-export async function GET(
-  req: NextApiRequest | Request | NextRequest,
-  res: NextApiResponse<ApiResponse>
-) {
   const params = {
     Bucket: "internetisgreat",
   };
@@ -29,17 +30,26 @@ export async function GET(
     const command = new ListObjectsV2Command(params);
     const { Contents } = await s3Client.send(command);
     const files = Contents?.map((file) => file.Key ?? "").filter(Boolean) || [];
-
     console.log(files);
-    console.log(res);
-    console.log(typeof res.status);
-    return Response.json({ files });
+    return new NextResponse(JSON.stringify({ files }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: "Error al listar los archivos del bucket",
-      message: error.message,
-      stack: process.env.NODE_ENV === "production" ? null : error.stack,
-    });
+    return new NextResponse(
+      JSON.stringify({
+        error: "Error al listar los archivos del bucket",
+        message: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 }
