@@ -2,7 +2,6 @@
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { NextRequest } from "next/server";
-import { Request } from "node-fetch";
 
 const s3Client = new S3Client({
   credentials: {
