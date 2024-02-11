@@ -31,3 +31,42 @@ body {
     text-wrap: balance;
   }
 }
+
+@font-face {
+  font-family: 'pixel';
+  src: url('/fonts/pixel.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@keyframes rainbowAnimation {
+  0% { background-position: -100% 50%; } /* Start from violet-red */
+  100% { background-position: 300% 50%; } /* End at red-orange */
+}
+
+.rainbow-text {
+  background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet, red);
+  background-size: 400%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: rainbowAnimation 12s linear infinite;
+}
+.rainbow-button {
+  background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet, red);
+  background-size: 400%; /* Ensure complete gradient coverage */
+  animation: rainbowButtonAnimation 12s linear infinite;
+  color: #fff;
+  border: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+}
+
+@keyframes rainbowButtonAnimation {
+  0% { background-position: -100% 50%; } /* Start from violet-red */
+  100% { background-position: 300% 50%; } /* End at red-orange */
+}
+.text-stroke {
+  -webkit-text-stroke: 1px black; /* Ancho y color del contorno */
+  color: white; /* Color del texto */
+}
