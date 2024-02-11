@@ -1,6 +1,8 @@
 // src/app/api/getFiles/route.ts
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextRequest } from "next/server";
+import { Request } from "node-fetch";
 
 const s3Client = new S3Client({
   credentials: {
@@ -13,11 +15,11 @@ const s3Client = new S3Client({
 interface ApiResponse {
   files: string[];
   error?: string;
+  message?: string;
 }
 
-// Exporta explícitamente la función para manejar solicitudes GET
 export async function GET(
-  req: NextApiRequest,
+  req: NextApiRequest | Request | NextRequest,
   res: NextApiResponse<ApiResponse>
 ) {
   const params = {
