@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { videoMimeTypes, imageMimeTypes } from "./mimeType"; // Importa los tipos MIME
+import { videoMimeTypes, imageMimeTypes } from "./mimeType";
 import { CSSProperties } from "react";
-// Importa el tipo CSSProperties para estilos
+import { PacmanLoader } from "react-spinners";
+
 interface RandomFileProps {
   files: string[];
   selectedFile: string;
@@ -16,10 +17,11 @@ const RandomFileComponent: React.FC<RandomFileProps> = ({
   const [mediaSource, setMediaSource] = useState<"video" | "image" | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (selectedFile) {
-      // Asegura un valor por defecto para fileExtension para evitar el problema de string | undefined
+      setIsLoading(true);
       const fileExtension = selectedFile.split(".").pop()?.toLowerCase() ?? "";
 
       if (videoMimeTypes.includes(fileExtension)) {
@@ -27,17 +29,18 @@ const RandomFileComponent: React.FC<RandomFileProps> = ({
       } else if (imageMimeTypes.includes(fileExtension)) {
         setMediaSource("image");
       } else {
-        setMediaSource(null); // Maneja tipos de archivo no soportados de forma elegante
+        setMediaSource(null);
+        setIsLoading(false);
       }
     }
   }, [selectedFile]);
 
   const pickRandomFile = () => {
+    setIsLoading(true);
     const randomIndex = Math.floor(Math.random() * files.length);
     onSelectFile(files[randomIndex]);
   };
 
-  // Función para obtener el src completo del archivo, aplicable tanto para video como imagen
   const getFileSource = () => {
     return `https://internetisgreat.s3.eu-west-3.amazonaws.com/${selectedFile}`;
   };
@@ -45,46 +48,54 @@ const RandomFileComponent: React.FC<RandomFileProps> = ({
   const mediaStyles: CSSProperties = {
     width: "460px",
     height: "574px",
-    objectFit: "cover", // Especifica el valor correcto para objectFit
+    objectFit: "cover",
+  };
+
+  const handleMediaLoad = () => {
+    setIsLoading(false);
   };
 
   return (
     <div className="items-center">
-      {selectedFile && mediaSource && (
-        <div>
-          {mediaSource === "video" && (
-            <video
-              key={selectedFile}
-              autoPlay
-              loop
-              style={mediaStyles}
-              controls={false}
-            >
-              <source
-                src={getFileSource()}
-                type={`video/${selectedFile.split(".").pop() ?? "mp4"}`}
-              />
-              {/* Se puede agregar fallbacks aquí si es necesario */}
-            </video>
-          )}
-          {mediaSource === "image" && (
-            <img
-              src={getFileSource()}
-              alt="Archivo Random"
-              key={selectedFile}
-              style={mediaStyles}
-            />
-          )}
+      {isLoading && (
+        <div className="flex justify-center items-center ">
+          <PacmanLoader className="my-20" color="#ffffff" size={30} />
         </div>
       )}
-      <div className="flex justify-center items-center  rainbow-text my-10">
-        <button
-          className="px-4 py-2 rainbow-button text-white font-pixel rounded transition duration-300 "
-          onClick={pickRandomFile}
+      {selectedFile && mediaSource === "video" && (
+        <video
+          key={selectedFile}
+          autoPlay
+          loop
+          style={mediaStyles}
+          controls={false}
+          onLoadedData={handleMediaLoad}
         >
-          <p className=" text-stroke">Load another</p>
-        </button>
-      </div>
+          <source
+            src={getFileSource()}
+            type={`video/${selectedFile.split(".").pop() ?? "mp4"}`}
+          />
+        </video>
+      )}
+      {selectedFile && mediaSource === "image" && (
+        <img
+          src={getFileSource()}
+          alt="Archivo Random"
+          key={selectedFile}
+          style={mediaStyles}
+          onLoad={handleMediaLoad} // Maneja la carga de la imagen
+        />
+      )}
+      {!isLoading && (
+        <div className="flex justify-center items-center rainbow-text my-10">
+          <button
+            className="px-4 py-2 rainbow-button text-white font-pixel rounded transition duration-300"
+            onClick={pickRandomFile}
+          >
+            <p className="text-stroke">Load another</p>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
