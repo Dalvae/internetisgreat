@@ -12,7 +12,7 @@ const pixel = localfont({
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center   lg:p-24">
+    <main className="flex min-h-screen flex-col items-center">
       <h1 className="font-pixel border-black rainbow-text my-5 md:text-3xl text-2xl">
         Internet is great
       </h1>

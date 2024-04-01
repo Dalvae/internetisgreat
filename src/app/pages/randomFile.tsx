@@ -48,7 +48,7 @@ function RandomFilePage() {
     setSelectedFile(newFile);
   };
   return (
-    <div>
+    <div className="my-20">
       {isLoading ? (
         <PacmanLoader className="my-20" color="#ffffff" size={30}>
           <span className="visually-hidden">Cargando...</span>
